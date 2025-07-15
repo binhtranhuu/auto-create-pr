@@ -31,7 +31,31 @@ jobs:
           head: ${{ github.ref_name }}
           pr_template_file: .github/PULL_REQUEST_TEMPLATE.md
           is_draft: yes
-          labels: '["auto-pr", "develop"]'
+          labels: '["auto-pr", "Develop"]'
+          prettify_title: yes
+
+  create-pr-uat:
+    name: Create PR to uat
+    # Not run when branch is newly created
+    if: ${{ github.event.created == false }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+      - name: Create PR if not exist
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ./.github/workflows/create-pr
+        with:
+          base: uat
+          head: ${{ github.ref_name }}
+          pr_template_file: .github/PULL_REQUEST_TEMPLATE.md
+          is_draft: yes
+          labels: '["auto-pr", "Uat"]'
           prettify_title: yes
 
   create-pr-staging:
